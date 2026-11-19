@@ -1,7 +1,6 @@
-
-const express = require('express');
-const request = require('supertest');
-const validateListing = require('../src/middlewares/validateListing');
+import express from 'express';
+import request from 'supertest';
+import validateListing from '../src/middlewares/validateListing.js';
 
 const app = express();
 app.use(express.json());

@@ -55,4 +55,4 @@ const validateListing = (req, res, next) => {
     next();
 };
 
-module.exports = validateListing;
+export default validateListing;
