@@ -2,16 +2,16 @@ CREATE TABLE Organisation (
     organisationID int,
     organisationName varchar(50),
     contactEmail varchar(50),
-    approvalStatus bit,
+    approvalStatus boolean DEFAULT false,
     CONSTRAINT pk PRIMARY KEY (organisationID)
 );
 
-CREATE TABLE User (
+CREATE TABLE Users (
     userID int,
     fullName varchar(50),
     email varchar(50),
-    isAdmin bit,
-    createdAt date,
+    isAdmin boolean DEFAULT false,
+    createdAt date DEFAULT CURRENT_DATE,
     CONSTRAINT pk PRIMARY KEY (userID)
 );
 
@@ -25,12 +25,13 @@ CREATE TABLE FoodListing (
 );
 
 CREATE TABLE Reservation (
-    userID int,
-    listingID int,
-    rAddress varchar(50),
-    deliveryStatus varchar(50),
+    reservationID int AUTO_INCREMENT,
+    userID int NOT NULL,
+    listingID int NOT NULL,
+    rAddress varchar(50) NOT NULL,
+    deliveryStatus varchar(50) NOT NULL,
     completedAt date,
-    CONSTRAINT pk PRIMARY KEY (userID, listingID),
-    CONSTRAINT fk1 FOREIGN KEY (userID) REFERENCES User,
+    CONSTRAINT pk PRIMARY KEY (reservationID),
+    CONSTRAINT fk1 FOREIGN KEY (userID) REFERENCES Users,
     CONSTRAINT fk2 FOREIGN KEY (listingID) REFERENCES FoodListing
 );
