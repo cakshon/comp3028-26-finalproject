@@ -61,4 +61,26 @@ router.post('/', async (req, res) => {
     }
 });
 
+router.get('/', async (req, res) => {
+    try {
+        const listings = await sql`
+            SELECT
+                listingid AS "listingID",
+                organisationid AS "organisationID",
+                listingname AS "listingName",
+                reservationstatus AS "reservationStatus"
+            FROM foodlisting
+            ORDER BY listingid DESC
+        `;
+
+        return res.status(200).json({ listings });
+    } catch (error) {
+        console.error('Failed to retrieve listings:', error.code);
+
+        return res.status(500).json({
+            message: 'Unable to retrieve listings.',
+        });
+    }
+});
+
 export default router;
