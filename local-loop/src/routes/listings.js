@@ -83,4 +83,61 @@ router.get('/', async (req, res) => {
     }
 });
 
+// Update an existing listing
+router.patch('/:id', async (req, res) => {
+    const listingID = Number(req.params.id);
+    const { listingName } = req.body ?? {};
+
+    // Validate listing ID
+    if (
+        !Number.isInteger(listingID) ||
+        listingID <= 0 ||
+        listingID > 2147483647
+    ) {
+        return res.status(400).json({
+            message: 'Invalid listing ID.'
+        });
+    }
+
+    // Validate listing name
+    if (
+        typeof listingName !== 'string' ||
+        listingName.trim().length === 0 ||
+        listingName.trim().length > 50
+    ) {
+        return res.status(400).json({
+            message: 'Listing name must contain between 1 and 50 characters.'
+        });
+    }
+
+    try {
+        const [listing] = await sql`
+            UPDATE foodlisting
+            SET listingname = ${listingName.trim()}
+            WHERE listingid = ${listingID}
+            RETURNING
+                listingid AS "listingID",
+                organisationid AS "organisationID",
+                listingname AS "listingName",
+                reservationstatus AS "reservationStatus"
+        `;
+
+        // Check if listing exists
+        if (!listing) {
+            return res.status(404).json({
+                message: 'Listing not found.'
+            });
+        }
+
+        return res.status(200).json({ listing });
+
+    } catch (error) {
+        console.error('Failed to update listing:', error.code);
+
+        return res.status(500).json({
+            message: 'Unable to update listing.'
+        });
+    }
+});
+
 export default router;
