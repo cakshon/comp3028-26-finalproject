@@ -140,4 +140,55 @@ router.patch('/:id', async (req, res) => {
     }
 });
 
+
+// Delete an existing listing
+router.delete('/:id', async (req, res) => {
+    const listingID = Number(req.params.id);
+
+    // Validate listing ID
+    if (
+        !Number.isInteger(listingID) ||
+        listingID <= 0 ||
+        listingID > 2147483647
+    ) {
+        return res.status(400).json({
+            message: 'Invalid listing ID.'
+        });
+    }
+
+    try {
+        const [listing] = await sql`
+            DELETE FROM foodlisting
+            WHERE listingid = ${listingID}
+            RETURNING listingid
+        `;
+
+        // Check if listing exists
+        if (!listing) {
+            return res.status(404).json({
+                message: 'Listing not found.'
+            });
+        }
+
+        return res.status(200).json({
+            message: 'Listing deleted successfully.'
+        });
+
+    } catch (error) {
+        // Check for related database records
+        if (error.code === '23503') {
+            return res.status(409).json({
+                message: 'Listing has related records and cannot be deleted.'
+            });
+        }
+
+        console.error('Failed to delete listing:', error.code);
+
+        return res.status(500).json({
+            message: 'Unable to delete listing.'
+        });
+    }
+});
+
+
 export default router;
